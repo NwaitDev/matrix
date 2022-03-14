@@ -39,8 +39,16 @@ namespace mat {
     // Initialisation constructor
     template<int DataLength>
     constexpr Matrix(const Type(&data)[DataLength]) {
+      if constexpr (Order == MatrixOrdering::RowMajor)
       for (int i = 0; i < DataLength; ++i) {
         m_data[i] = data[i];
+      }
+      else
+      {
+        for( int i = 0; i < DataLength; ++i)
+        {
+          m_data[i] = data[i];
+        } 
       }
     }
 
@@ -54,6 +62,17 @@ namespace mat {
 
     // Retrun the transposed matrix
     constexpr Matrix<Type, Cols, Rows, Order> transpose() {
+      Matrix<Type, Cols, Rows, Order> result;
+      for(int i = 0; i < Rows; ++i)
+      {
+        for(int j = 0; j < Cols; ++j)
+        {
+          result(j, i) = this->operator()(i, j);
+        }
+      }
+      return result;
+    
+
     }
 
     // Get the value at specified row and col
@@ -76,21 +95,39 @@ namespace mat {
     // Addition - in place
     template<typename OtherType, MatrixOrdering otherOrder>
     auto& operator+=(const Matrix<OtherType, Rows, Cols, otherOrder>& other) {
+      for (int i = 0; i < Size; ++i) {
+        m_data[i] += other.m_data[i];
+      }
+      return *this;
     }
 
     // Addition - classic
     template<typename OtherType, MatrixOrdering otherOrder>
     constexpr Matrix<std::common_type_t<Type, OtherType>, Rows, Cols, Order> operator+(const Matrix<OtherType, Rows, Cols, otherOrder>& other) const {
+      Matrix<std::common_type_t<Type, OtherType>, Rows, Cols, Order> result;
+      for (int i = 0; i < Size; ++i) {
+        result.m_data[i] = m_data[i] + other.m_data[i];
+      }
+      return result;
     }
 
     // Substration - in place
     template<typename OtherType, MatrixOrdering otherOrder>
     auto& operator-=(const Matrix<OtherType, Rows, Cols, otherOrder>& other) {
+      for (int i = 0; i < Size; ++i) {
+        m_data[i] -= other.m_data[i];
+      }
+      return *this;
     }
 
     // Substraction - classic
     template<typename OtherType, MatrixOrdering otherOrder>
     constexpr Matrix<std::common_type_t<Type, OtherType>, Rows, Cols, Order> operator-(const Matrix<OtherType, Rows, Cols, otherOrder>& other) const {
+      Matrix<std::common_type_t<Type, OtherType>, Rows, Cols, Order> result;
+      for (int i = 0; i < Size; ++i) {
+        result.m_data[i] = m_data[i] - other.m_data[i];
+      }
+      return result;
     }
 
     // Product - in place
@@ -112,11 +149,13 @@ namespace mat {
     // Equality
     template<typename OtherType, int OtherRows, int OtherCols, MatrixOrdering otherOrder>
     constexpr bool operator==(const Matrix<OtherType, OtherRows, OtherCols, otherOrder>& other) const {
+      return m_data == other.m_data;
     }
 
     // Difference
     template<typename OtherType, int OtherRows, int OtherCols, MatrixOrdering otherOrder>
     constexpr bool operator!=(const Matrix<OtherType, OtherRows, OtherCols, otherOrder>& other) const {
+      return m_data != other.m_data;
     }
 
   public:
@@ -219,14 +258,21 @@ namespace mat {
    * Define here the VecR and VecC classes
    */
 
-  /*
+  
+  template<typename Type, int lenght>
+  using  VecR = Matrix<Type ,lenght, 1, MatrixOrdering::RowMajor>;
+  template<typename Type, int lenght>
+  using VecC = Matrix<Type,1, lenght,  MatrixOrdering::ColMajor>;
+
 
   template<typename Type, int Cols>
   constexpr VecR<Type, Cols> vecRow(const Type(&data)[Cols]) {
+    return VecR<Type, Cols>(data);
   }
 
   template<typename Type, int Rows>
   constexpr VecC<Type, Rows> vecCol(const Type(&data)[Rows]) {
+    return VecC<Type, Rows>(data);
   }
 
   // Convert the matrix to the opposite ordering
@@ -234,12 +280,19 @@ namespace mat {
   constexpr auto convert(const Matrix<Type, Rows, Cols, Order>& mat) {
   }
 
-  // Retrun the identity matrix
+  
+
+  // Return the identity matrix
   template<typename Type, int Size>
   constexpr Matrix<Type, Size, Size> identity() {
+    Matrix<Type, Size, Size> result;
+    for (int i = 0; i < Size; ++i) {
+      result.m_data[i * Size + i] = 1;
+    }
+    return result;
   }
 
-  */
+  
 }
 
 #endif // MAT_MATRIX_H
