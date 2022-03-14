@@ -192,7 +192,7 @@ TEST(matrixCreate, matrixInt2x2ElemColMaj){
   EXPECT_TRUE(m(1,1)==0);
 }
 
-TEST(matrixCreate, matrixDouble2x2ElemColMajFromTab){
+TEST(matrixCreate, matrixInt2x2ElemColMajFromTab){
   mat::Matrix<int,2,2> m({
     1, 2,
     3, 4 
@@ -205,6 +205,43 @@ TEST(matrixCreate, matrixDouble2x2ElemColMajFromTab){
   EXPECT_EQ(3, m(0,1));
   EXPECT_EQ(2, m(1,0));
   EXPECT_EQ(4, m(1,1));
+}
+
+//-------------------------------------------------------------
+//------------------------------------------------------------
+//-----------------Conversion constructor
+
+TEST(matrixCreate, matrixInt2x2FromMat){
+  mat::Matrix<int,2,2> m1({
+    1, 2,
+    3, 4 
+  });
+  mat::Matrix<int,2,2>m2(m1);
+  EXPECT_TRUE(m2.Size == 4);
+  EXPECT_TRUE(m2.Rows == 2);
+  EXPECT_TRUE(m2.Cols == 2);
+  EXPECT_TRUE(m2.Order == mat::MatrixOrdering::ColMajor);
+  EXPECT_EQ(1, m2(0,0));
+  EXPECT_EQ(3, m2(0,1));
+  EXPECT_EQ(2, m2(1,0));
+  EXPECT_EQ(4, m2(1,1));
+}
+
+//-------------------------------------------------------------
+//------------------------------------------------------------
+//-----------------Test Create Identity
+
+TEST(matrixCreate, Identity1Matrix1){
+  mat::Matrix<int,1,1> m = mat::identity<int,1>
+  EXPECT_EQ(1, m2(0,0));
+}
+
+TEST(matrixCreate, Identity1Matrix2){
+  mat::Matrix<int,2,2> m = mat::identity<int,1>();
+  EXPECT_EQ(1, m2(0,0));
+  EXPECT_EQ(1, m2(1,1));
+  EXPECT_EQ(1, m2(0,1));
+  EXPECT_EQ(1, m2(1,0));
 }
 
 int main(int argc, char* argv[]) {

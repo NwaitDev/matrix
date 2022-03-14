@@ -233,13 +233,15 @@ namespace mat {
   template<typename Type, int Rows, int Cols, MatrixOrdering Order>
   constexpr auto convert(const Matrix<Type, Rows, Cols, Order>& mat) {
   }
+  
+  */
 
   // Retrun the identity matrix
   template<typename Type, int Size>
   constexpr Matrix<Type, Size, Size> identity() {
+    
   }
 
-  */
 }
 
 #endif // MAT_MATRIX_H
