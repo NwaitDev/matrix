@@ -43,12 +43,15 @@ namespace mat {
       for (int i = 0; i < DataLength; ++i) {
         m_data[i] = data[i];
       }
-      else
+      else if constexpr (Order == MatrixOrdering::ColMajor)
       {
-        for( int i = 0; i < DataLength; ++i)
+        for(int i = 0 ; i < Cols; ++i)
         {
-          m_data[i] = data[i];
-        } 
+          for(int j = 0 ; j < Rows; ++j)
+          {
+            this->operator()(j,i) = data[j * Cols + i];
+          }
+        }
       }
     }
 
@@ -63,6 +66,7 @@ namespace mat {
     // Retrun the transposed matrix
     constexpr Matrix<Type, Cols, Rows, Order> transpose() {
       Matrix<Type, Cols, Rows, Order> result;
+
       for(int i = 0; i < Rows; ++i)
       {
         for(int j = 0; j < Cols; ++j)
@@ -70,6 +74,7 @@ namespace mat {
           result(j, i) = this->operator()(i, j);
         }
       }
+
       return result;
     
 
@@ -77,19 +82,14 @@ namespace mat {
 
     // Get the value at specified row and col
     constexpr const Type& operator() (int row, int col) const {
-      if constexpr (Order == MatrixOrdering::RowMajor) {
-        return m_data[row * Cols + col];
-      } else {
-        return m_data[col * Rows + row];
-      }
+
+        return m_data[col + row * Cols];
+ 
     }
 
     constexpr Type& operator() (int row, int col) {
-      if constexpr (Order == MatrixOrdering::RowMajor) {
-        return m_data[row * Cols + col];
-      } else {
-        return m_data[col * Rows + row];
-      }
+        return m_data[col + row * Cols];
+
     }
 
     // Addition - in place

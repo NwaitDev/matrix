@@ -284,13 +284,13 @@ TEST(matrixCreate, matrixDoubleTwoElemColMaj){
 }
 
 TEST(matrixCreate, matrixDoubleTwoElemColMajFromTab){
-  mat::Matrix<double,1,2> m({
+  mat::Matrix<double,1,2, mat::MatrixOrdering::ColMajor> m({
     1.75, 2.25
   });
   EXPECT_TRUE(m.Size == 2);
   EXPECT_TRUE(m.Rows == 1);
   EXPECT_TRUE(m.Cols == 2);
-  EXPECT_TRUE(m.Order == mat::MatrixOrdering::RowMajor);
+  EXPECT_TRUE(m.Order == mat::MatrixOrdering::ColMajor);
   EXPECT_DOUBLE_EQ(1.75, m(0,0));
   EXPECT_DOUBLE_EQ(2.25, m(0,1));
 }
@@ -356,7 +356,7 @@ TEST(matrixCreate, matrixInt2x2ElemColMaj){
 }
 
 TEST(matrixCreate, matrixDouble2x2ElemColMajFromTab){
-  mat::Matrix<int,2,2> m({
+  mat::Matrix<int,2,2,mat::MatrixOrdering::ColMajor> m({
     1, 2,
     3, 4 
   });
@@ -368,6 +368,22 @@ TEST(matrixCreate, matrixDouble2x2ElemColMajFromTab){
   EXPECT_EQ(3, m(0,1));
   EXPECT_EQ(2, m(1,0));
   EXPECT_EQ(4, m(1,1));
+}
+
+TEST(matrixCreate , matrix3x2ElemColMajFromTab){
+  mat::Matrix<int,3,2,mat::MatrixOrdering::ColMajor> m({
+    1, 2,
+    3, 4,
+    5, 6
+  });
+  EXPECT_TRUE(m.Size == 6);
+  EXPECT_TRUE(m.Rows == 3);
+  EXPECT_TRUE(m.Cols == 2);
+  EXPECT_TRUE(m.Order == mat::MatrixOrdering::ColMajor);
+  EXPECT_EQ(1, m(0,0));
+  EXPECT_EQ(3, m(0,1));
+  EXPECT_EQ(5, m(2,0));
+  EXPECT_EQ(6, m(2,1));
 }
 
 int main(int argc, char* argv[]) {
