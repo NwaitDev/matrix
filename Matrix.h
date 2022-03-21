@@ -45,19 +45,31 @@ namespace mat {
       }
       else if constexpr (Order == MatrixOrdering::ColMajor)
       {
-        for(int i = 0 ; i < Cols; ++i)
-        {
-          for(int j = 0 ; j < Rows; ++j)
-          {
-            this->operator()(j,i) = data[j * Cols + i];
-          }
+
+        for (int i = 0; i < DataLength; ++i) {
+          int row = i / Cols;
+          int col = i % Cols;
+         this->operator()(row, col) = data[i];
         }
+          
       }
+      for(int i = 0; i < Size; ++i) {
+         std::cout << m_data[i] << " ";
+      }
+      std::cout << std::endl;
+
     }
 
-    // Conversion constructor
-    constexpr Matrix(const Matrix<Type, Rows, Cols, Order>& other) {
+
+    // conversion constructor
+    template<MatrixOrdering OtherOrder>
+    constexpr Matrix(const Matrix<Type, Rows, Cols, OtherOrder>& other) {
+      for(int i = 0; i < Size; ++i) {
+        m_data[i] = other.m_data[i];
+      }
     }
+    
+
 
     // Affectation from a matrix with different ordering
     constexpr auto& operator=(const Matrix<Type, Rows, Cols, Order>& other) {
@@ -83,12 +95,12 @@ namespace mat {
     // Get the value at specified row and col
     constexpr const Type& operator() (int row, int col) const {
 
-        return m_data[col + row * Cols];
+        return m_data[row * Cols + col];
  
     }
 
     constexpr Type& operator() (int row, int col) {
-        return m_data[col + row * Cols];
+        return m_data[row * Cols + col];
 
     }
 
@@ -144,6 +156,22 @@ namespace mat {
     // Product - classic
     template<typename OtherType, int OtherCols, MatrixOrdering otherOrder>
     constexpr Matrix<std::common_type_t<Type, OtherType>, Rows, OtherCols, Order> operator*(const Matrix<OtherType, Cols, OtherCols, otherOrder>& other) const {
+      Matrix<std::common_type_t<Type , OtherType>, Rows, OtherCols, Order> result;
+      for( int i = 0; i < Rows; ++i)
+      {
+        for(int j = 0; j < OtherCols; ++j)
+        {
+          result(i, j) = 0;
+          for(int k = 0; k < Cols; ++k)
+          {
+            result(i, j) += this->operator()(i, k) * other(k, j);
+          }
+        }
+            
+      }
+      return result;
+
+
     }
 
     // Equality
@@ -176,13 +204,87 @@ namespace mat {
       using pointer = Type*;
       using reference = Type&;
 
-      iterator() = default;
-      iterator(pointer ptr) : m_ptr(ptr) {}
-      reference operator*() const { return *m_ptr; }
-      pointer operator->() { return m_ptr; }
-      iterator& operator++() { ++m_ptr; return *this; }
-      iterator operator++(int) { iterator tmp(*this); ++(*this); return tmp; }
-      iterator& operator--() { --m_ptr; return *this; }
+
+
+   
+      iterator() :
+        m_ptr(nullptr)
+      {
+        pos_ref = 0;
+        col_ref = 0;
+        col_counter = 0;
+        m_begin = m_ptr;
+        m_end = m_ptr + Size;
+      }
+      iterator(pointer ptr) : m_ptr(ptr) {
+        m_begin = m_ptr;
+        m_end = m_ptr + Size;
+        pos_ref = 0;
+        col_ref = 0;
+        col_counter = 0;
+      }
+
+
+      reference operator*() const {
+        return *(m_ptr  );
+      }
+      pointer operator->() {  return m_ptr ; }
+      iterator& operator++()
+      { 
+        
+        if(order == MatrixOrdering::RowMajor)
+        {
+          
+            ++m_ptr;
+        }
+        else
+        {
+        // std::cout << "curr pos : " << col_ref << std::endl;
+
+          if(pos_ref < Size)
+          {
+            col_ref =  (col_ref + Cols  ) % Size;
+
+            if(col_ref % Rows  == 0)
+            {
+
+              col_counter +=1 ;
+             
+            }
+            col_ref = (col_ref ) % Size ;
+            m_ptr = m_begin + col_ref + col_counter;
+        
+          }
+          else
+          {
+            m_ptr = m_end;
+          }
+          if(col_counter == Cols)
+          {
+            m_ptr = m_end;
+            return *this;
+          }
+        
+        }
+
+
+        pos_ref++;
+
+
+        return *this;
+         
+      }
+      iterator operator++(int)
+      {
+        iterator tmp = *this;
+        ++*this;
+        return tmp;
+      }
+      iterator& operator--()
+      {
+        m_ptr--;
+        return *this;
+      }
       iterator operator--(int) { iterator tmp(*this); --(*this); return tmp; }
       bool operator==(const iterator& other) const { return m_ptr == other.m_ptr; }
       bool operator!=(const iterator& other) const { return m_ptr != other.m_ptr; }
@@ -193,6 +295,12 @@ namespace mat {
 
     private:
       pointer m_ptr;
+      pointer m_end;
+      pointer m_begin;
+      int pos_ref;
+      int col_ref;
+      int col_counter;
+
 
 
     };
@@ -278,6 +386,7 @@ namespace mat {
   // Convert the matrix to the opposite ordering
   template<typename Type, int Rows, int Cols, MatrixOrdering Order>
   constexpr auto convert(const Matrix<Type, Rows, Cols, Order>& mat) {
+
   }
   
   */

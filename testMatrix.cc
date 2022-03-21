@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <algorithm>
+#include <iostream>
 #include "Matrix.h"
 
 
@@ -160,6 +161,51 @@ TEST(matrixTranspose , transposeBasic)
   EXPECT_EQ(5, m2(2, 0));
   EXPECT_EQ(6, m2(2, 1));
 
+
+}
+
+TEST(matrixMultiply , multiplyBasic)
+{
+  mat::Matrix<int, 2, 2> m1;
+  m1(0, 0) = 1;
+  m1(0, 1) = 2;
+  m1(1, 0) = 3;
+  m1(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m2;
+  m2(0, 0) = 1;
+  m2(0, 1) = 2;
+  m2(1, 0) = 3;
+  m2(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m3 = m1 * m2;
+  EXPECT_EQ(7, m3(0, 0));
+  EXPECT_EQ(10, m3(0, 1));
+  EXPECT_EQ(15, m3(1, 0));
+  EXPECT_EQ(22, m3(1, 1));
+}
+
+TEST(matrixMultiply , differentSize)
+{
+  mat::Matrix<int, 2, 3> m1;
+  m1(0, 0) = 1;
+  m1(0, 1) = 2;
+  m1(0, 2) = 3;
+  m1(1, 0) = 4;
+  m1(1, 1) = 5;
+  m1(1, 2) = 6;
+
+  mat::Matrix<int, 3, 2> m2;
+  m2(0, 0) = 1;
+  m2(0, 1) = 2;
+  m2(1, 0) = 3;
+  m2(1, 1) = 4;
+  m2(2, 0) = 5;
+  m2(2, 1) = 6;
+
+  mat::Matrix<int, 2, 2> m3 = m1 * m2;
+  EXPECT_EQ(22, m3(0, 0));
+  EXPECT_EQ(28, m3(0, 1));
+  EXPECT_EQ(49, m3(1, 0));
+  EXPECT_EQ(64, m3(1, 1));
 
 }
 
@@ -365,8 +411,8 @@ TEST(matrixCreate, matrixDouble2x2ElemColMajFromTab){
   EXPECT_TRUE(m.Cols == 2);
   EXPECT_TRUE(m.Order == mat::MatrixOrdering::ColMajor);
   EXPECT_EQ(1, m(0,0));
-  EXPECT_EQ(3, m(0,1));
-  EXPECT_EQ(2, m(1,0));
+  EXPECT_EQ(2, m(0,1));
+  EXPECT_EQ(3, m(1,0));
   EXPECT_EQ(4, m(1,1));
 }
 
@@ -411,12 +457,31 @@ TEST(matrixCreate , matrix3x2ElemColMajFromTab){
     3, 4,
     5, 6
   });
+  int i = 0;
+  for(auto elem : m)
+  {
+    i += elem;
+   std::cout << elem << std::endl;
+  }
+  // get an iterator to the first element
+  auto it = m.begin();
+  EXPECT_TRUE(*it == 1);
+  EXPECT_TRUE(*(++it) == 3);
+  EXPECT_TRUE(*(++it) == 5);
+  EXPECT_TRUE(*(++it) == 2);
+  EXPECT_TRUE(*(++it) == 4);
+  EXPECT_TRUE(*(++it) == 6);
+  EXPECT_TRUE(++it == m.end());
+
+  std::cout << "i opti : " << i << std::endl;
+
+
   EXPECT_TRUE(m.Size == 6);
   EXPECT_TRUE(m.Rows == 3);
   EXPECT_TRUE(m.Cols == 2);
   EXPECT_TRUE(m.Order == mat::MatrixOrdering::ColMajor);
   EXPECT_EQ(1, m(0,0));
-  EXPECT_EQ(3, m(0,1));
+  EXPECT_EQ(2, m(0,1));
   EXPECT_EQ(5, m(2,0));
   EXPECT_EQ(6, m(2,1));
 }
