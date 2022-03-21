@@ -429,10 +429,10 @@ TEST(matrixCreate, matrixInt2x2FromMat){
   EXPECT_TRUE(m2.Size == 4);
   EXPECT_TRUE(m2.Rows == 2);
   EXPECT_TRUE(m2.Cols == 2);
-  EXPECT_TRUE(m2.Order == mat::MatrixOrdering::ColMajor);
+  EXPECT_TRUE(m2.Order == mat::MatrixOrdering::RowMajor);
   EXPECT_EQ(1, m2(0,0));
-  EXPECT_EQ(3, m2(0,1));
-  EXPECT_EQ(2, m2(1,0));
+  EXPECT_EQ(2, m2(0,1));
+  EXPECT_EQ(3, m2(1,0));
   EXPECT_EQ(4, m2(1,1));
 }
 
@@ -441,16 +441,18 @@ TEST(matrixCreate, matrixInt2x2FromMat){
 //-----------------Test Create Identity
 
 TEST(matrixCreate, Identity1Matrix1){
-  mat::Matrix<int,1,1> m = mat::identity<int,1>
-  EXPECT_EQ(1, m2(0,0));
+  mat::Matrix<int,1,1> m = mat::identity<int,1>();
+  EXPECT_EQ(1, m(0,0));
 }
 
 TEST(matrixCreate, Identity1Matrix2){
-  mat::Matrix<int,2,2> m = mat::identity<int,1>();
-  EXPECT_EQ(1, m2(0,0));
-  EXPECT_EQ(1, m2(1,1));
-  EXPECT_EQ(1, m2(0,1));
-  EXPECT_EQ(1, m2(1,0));
+  mat::Matrix<int,2,2> m = mat::identity<int,2>();
+  EXPECT_EQ(1, m(0,0));
+  EXPECT_EQ(1, m(1,1));
+  EXPECT_EQ(0, m(0,1));
+  EXPECT_EQ(0, m(1,0));
+}
+
 TEST(matrixCreate , matrix3x2ElemColMajFromTab){
   mat::Matrix<int,3,2,mat::MatrixOrdering::ColMajor> m({
     1, 2,

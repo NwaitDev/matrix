@@ -72,7 +72,12 @@ namespace mat {
 
 
     // Affectation from a matrix with different ordering
-    constexpr auto& operator=(const Matrix<Type, Rows, Cols, Order>& other) {
+    template<MatrixOrdering OtherOrder>
+    constexpr auto& operator=(const Matrix<Type, Rows, Cols, OtherOrder>& other) {
+      for(int i = 0; i < Size; ++i) {
+        m_data[i] = other.m_data[i];
+      }
+      return *this;
     }
 
     // Retrun the transposed matrix
@@ -94,14 +99,11 @@ namespace mat {
 
     // Get the value at specified row and col
     constexpr const Type& operator() (int row, int col) const {
-
-        return m_data[row * Cols + col];
- 
+      return m_data[row * Cols + col];
     }
 
     constexpr Type& operator() (int row, int col) {
         return m_data[row * Cols + col];
-
     }
 
     // Addition - in place
@@ -170,8 +172,6 @@ namespace mat {
             
       }
       return result;
-
-
     }
 
     // Equality
@@ -204,9 +204,6 @@ namespace mat {
       using pointer = Type*;
       using reference = Type&;
 
-
-
-   
       iterator() :
         m_ptr(nullptr)
       {
@@ -216,6 +213,7 @@ namespace mat {
         m_begin = m_ptr;
         m_end = m_ptr + Size;
       }
+
       iterator(pointer ptr) : m_ptr(ptr) {
         m_begin = m_ptr;
         m_end = m_ptr + Size;
@@ -224,36 +222,31 @@ namespace mat {
         col_counter = 0;
       }
 
-
       reference operator*() const {
         return *(m_ptr  );
       }
+
       pointer operator->() {  return m_ptr ; }
+
       iterator& operator++()
       { 
-        
         if(order == MatrixOrdering::RowMajor)
         {
-          
-            ++m_ptr;
+          ++m_ptr;
         }
         else
         {
         // std::cout << "curr pos : " << col_ref << std::endl;
-
           if(pos_ref < Size)
           {
             col_ref =  (col_ref + Cols  ) % Size;
 
             if(col_ref % Rows  == 0)
             {
-
               col_counter +=1 ;
-             
             }
             col_ref = (col_ref ) % Size ;
             m_ptr = m_begin + col_ref + col_counter;
-        
           }
           else
           {
@@ -264,22 +257,18 @@ namespace mat {
             m_ptr = m_end;
             return *this;
           }
-        
         }
-
-
         pos_ref++;
-
-
         return *this;
-         
       }
+
       iterator operator++(int)
       {
         iterator tmp = *this;
         ++*this;
         return tmp;
       }
+
       iterator& operator--()
       {
         m_ptr--;
@@ -388,17 +377,13 @@ namespace mat {
   constexpr auto convert(const Matrix<Type, Rows, Cols, Order>& mat) {
 
   }
-  
-  */
-
-  
 
   // Return the identity matrix
   template<typename Type, int Size>
   constexpr Matrix<Type, Size, Size> identity() {
     Matrix<Type, Size, Size> result;
     for (int i = 0; i < Size; ++i) {
-      result.m_data[i * Size + i] = 1;
+      result(i,i) = 1;
     }
     return result;
   }
