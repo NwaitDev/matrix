@@ -2,6 +2,7 @@
 #define MAT_MATRIX_H
 
 #include <array>
+#include <iostream>
 
 namespace mat {
   enum class MatrixOrdering {
@@ -207,8 +208,8 @@ namespace mat {
       iterator() :
         m_ptr(nullptr)
       {
-        pos_ref = 0;
-        col_ref = 0;
+        it_index = 0;
+        actual_index = 0;
         col_counter = 0;
         m_begin = m_ptr;
         m_end = m_ptr + Size;
@@ -217,8 +218,8 @@ namespace mat {
       iterator(pointer ptr) : m_ptr(ptr) {
         m_begin = m_ptr;
         m_end = m_ptr + Size;
-        pos_ref = 0;
-        col_ref = 0;
+        it_index = 0;
+        actual_index = 0;
         col_counter = 0;
       }
 
@@ -229,36 +230,27 @@ namespace mat {
       pointer operator->() {  return m_ptr ; }
 
       iterator& operator++()
-      { 
+      {
+        it_index++;
         if(order == MatrixOrdering::RowMajor)
         {
           ++m_ptr;
         }
         else
         {
-        // std::cout << "curr pos : " << col_ref << std::endl;
-          if(pos_ref < Size)
-          {
-            col_ref =  (col_ref + Cols  ) % Size;
-
-            if(col_ref % Rows  == 0)
-            {
-              col_counter +=1 ;
-            }
-            col_ref = (col_ref ) % Size ;
-            m_ptr = m_begin + col_ref + col_counter;
-          }
-          else
-          {
-            m_ptr = m_end;
-          }
-          if(col_counter == Cols)
-          {
-            m_ptr = m_end;
-            return *this;
+          if (it_index >= Size){
+              it_index++;
+              m_ptr = m_end;
+          }else{
+              if(actual_index + Cols>=Size){
+                  col_counter++;
+                  actual_index = col_counter;
+              }else{
+                  actual_index+=Cols;
+              }
+              m_ptr = m_begin+actual_index;
           }
         }
-        pos_ref++;
         return *this;
       }
 
@@ -271,27 +263,44 @@ namespace mat {
 
       iterator& operator--()
       {
-        m_ptr--;
+        it_index--;
+        if(order == MatrixOrdering::RowMajor)
+        {
+          --m_ptr;
+        }
+        else
+        {
+          if(m_ptr==m_end){
+            m_ptr = m_begin+actual_index;
+          }else{
+            if (it_index < 0){
+              m_ptr = m_begin;
+            }else{
+              if(actual_index - Cols<0){
+                  col_counter--;
+                  actual_index = Size-(Cols-col_counter);
+              }else{
+                  actual_index-=Cols;
+              }
+              m_ptr = m_begin+actual_index;
+            }
+          }
+          
+        }
         return *this;
       }
+
       iterator operator--(int) { iterator tmp(*this); --(*this); return tmp; }
       bool operator==(const iterator& other) const { return m_ptr == other.m_ptr; }
       bool operator!=(const iterator& other) const { return m_ptr != other.m_ptr; }
-
-
-
-
 
     private:
       pointer m_ptr;
       pointer m_end;
       pointer m_begin;
-      int pos_ref;
-      int col_ref;
+      int it_index;
+      int actual_index;
       int col_counter;
-
-
-
     };
 
     class const_iterator

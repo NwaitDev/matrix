@@ -463,7 +463,6 @@ TEST(matrixCreate , matrix3x2ElemColMajFromTab){
   for(auto elem : m)
   {
     i += elem;
-   std::cout << elem << std::endl;
   }
   // get an iterator to the first element
   auto it = m.begin();
@@ -476,6 +475,42 @@ TEST(matrixCreate , matrix3x2ElemColMajFromTab){
   EXPECT_TRUE(++it == m.end());
 
   std::cout << "i opti : " << i << std::endl;
+
+
+  EXPECT_TRUE(m.Size == 6);
+  EXPECT_TRUE(m.Rows == 3);
+  EXPECT_TRUE(m.Cols == 2);
+  EXPECT_TRUE(m.Order == mat::MatrixOrdering::ColMajor);
+  EXPECT_EQ(1, m(0,0));
+  EXPECT_EQ(2, m(0,1));
+  EXPECT_EQ(5, m(2,0));
+  EXPECT_EQ(6, m(2,1));
+}
+
+TEST(matrixIter , ascendingandDescendingIter){
+  mat::Matrix<int,3,2,mat::MatrixOrdering::ColMajor> m({
+    1, 2,
+    3, 4,
+    5, 6
+  });
+  // get an iterator to the first element
+  auto it = m.begin();
+  EXPECT_TRUE(*it == 1);
+  EXPECT_TRUE(*(++it) == 3);
+  EXPECT_TRUE(*(++it) == 5);
+  EXPECT_TRUE(*(++it) == 2);
+  EXPECT_TRUE(*(++it) == 4);
+  EXPECT_TRUE(*(++it) == 6);
+  EXPECT_TRUE(++it == m.end());
+  EXPECT_TRUE(*(--it) == 6);
+  EXPECT_TRUE(*(--it) == 4);
+  EXPECT_TRUE(*(--it) == 2);
+
+  EXPECT_TRUE(*(--it) == 5);
+
+  EXPECT_TRUE(*(--it) == 3);
+
+  EXPECT_TRUE(*(--it) == 1);
 
 
   EXPECT_TRUE(m.Size == 6);
