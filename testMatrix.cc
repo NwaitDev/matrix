@@ -1,6 +1,169 @@
 #include <gtest/gtest.h>
-
+#include <algorithm>
 #include "Matrix.h"
+
+
+TEST(matrixIterator , basicIterator)
+{
+  mat::Matrix<int, 2 , 2> m;
+  m(0,0) = 1;
+  m(0,1) = 2;
+  m(1, 0) = 3;
+  m(1, 1) = 4;
+  mat::Matrix<int, 2 , 2>::iterator it = m.begin();
+  EXPECT_EQ(1, *it);
+  ++it;
+  EXPECT_EQ(2, *it);
+  ++it;
+  EXPECT_EQ(3, *it);
+  ++it;
+  EXPECT_EQ(4, *it);
+  ++it;
+  EXPECT_EQ(m.end(), it);
+}
+
+TEST(matrixIterator, maxElement)
+{
+  mat::Matrix<int, 2, 2> m;
+  m(0, 0) = 1;
+  m(0, 1) = 5;
+  m(1, 0) = 7;
+  m(1, 1) = 5;
+  auto max = std::max_element(m.begin(), m.end());
+  EXPECT_EQ(7, *max);
+}
+
+TEST(matrixAdd, addBasic)
+{
+  mat::Matrix<int, 2, 2> m1;
+  m1(0, 0) = 1;
+  m1(0, 1) = 2;
+  m1(1, 0) = 3;
+  m1(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m2;
+  m2(0, 0) = 1;
+  m2(0, 1) = 2;
+  m2(1, 0) = 3;
+  m2(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m3 = m1 + m2;
+  EXPECT_EQ(2, m3(0, 0));
+  EXPECT_EQ(4, m3(0, 1));
+  EXPECT_EQ(6, m3(1, 0));
+  EXPECT_EQ(8, m3(1, 1));
+}
+
+TEST(matrixAdd, inPlace)
+{
+  mat::Matrix<int, 2, 2> m1;
+  m1(0, 0) = 1;
+  m1(0, 1) = 2;
+  m1(1, 0) = 3;
+  m1(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m2;
+  m2(0, 0) = 1;
+  m2(0, 1) = 2;
+  m2(1, 0) = 3;
+  m2(1, 1) = 4;
+  m1 += m2;
+  EXPECT_EQ(2, m1(0, 0));
+  EXPECT_EQ(4, m1(0, 1));
+  EXPECT_EQ(6, m1(1, 0));
+  EXPECT_EQ(8, m1(1, 1));
+}
+
+
+TEST(matrixSub, subBasic)
+{
+  mat::Matrix<int, 2, 2> m1;
+  m1(0, 0) = 1;
+  m1(0, 1) = 2;
+  m1(1, 0) = 3;
+  m1(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m2;
+  m2(0, 0) = 1;
+  m2(0, 1) = 2;
+  m2(1, 0) = 3;
+  m2(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m3 = m1 - m2;
+  EXPECT_EQ(0, m3(0, 0));
+  EXPECT_EQ(0, m3(0, 1));
+  EXPECT_EQ(0, m3(1, 0));
+  EXPECT_EQ(0, m3(1, 1));
+}
+
+TEST(matrixSub , inPlace)
+{
+  mat::Matrix<int, 2, 2> m1;
+  m1(0, 0) = 1;
+  m1(0, 1) = 2;
+  m1(1, 0) = 3;
+  m1(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m2;
+  m2(0, 0) = 1;
+  m2(0, 1) = 2;
+  m2(1, 0) = 3;
+  m2(1, 1) = 4;
+  m1 -= m2;
+  EXPECT_EQ(0, m1(0, 0));
+  EXPECT_EQ(0, m1(0, 1));
+  EXPECT_EQ(0, m1(1, 0));
+  EXPECT_EQ(0, m1(1, 1));
+}
+
+
+TEST(matrixCompare, compareBasic)
+{
+  mat::Matrix<int, 2, 2> m1;
+  m1(0, 0) = 1;
+  m1(0, 1) = 2;
+  m1(1, 0) = 3;
+  m1(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m2;
+  m2(0, 0) = 1;
+  m2(0, 1) = 2;
+  m2(1, 0) = 3;
+  m2(1, 1) = 4;
+  EXPECT_TRUE(m1 == m2);
+}
+
+TEST(matrixCompare , compareDifferent)
+{
+  mat::Matrix<int, 2, 2> m1;
+  m1(0, 0) = 1;
+  m1(0, 1) = 2;
+  m1(1, 0) = 3;
+  m1(1, 1) = 4;
+  mat::Matrix<int, 2, 2> m2;
+  m2(0, 0) = 1;
+  m2(0, 1) = 2;
+  m2(1, 0) = 3;
+  m2(1, 1) = 5;
+  EXPECT_FALSE(m1 == m2);
+  EXPECT_TRUE(m1 != m2);
+}
+
+TEST(matrixTranspose , transposeBasic)
+{
+  mat::Matrix<int, 2, 3> m1;
+  m1(0, 0) = 1;
+  m1(0, 1) = 3;
+  m1(0, 2) = 5;
+  m1(1, 0) = 2;
+  m1(1, 1) = 4;
+  m1(1, 2) = 6;
+
+  mat::Matrix<int, 3, 2> m2 = m1.transpose();
+  EXPECT_EQ(1, m2(0, 0));
+  EXPECT_EQ(2, m2(0, 1));
+  EXPECT_EQ(3, m2(1, 0));
+  EXPECT_EQ(4, m2(1, 1));
+  EXPECT_EQ(5, m2(2, 0));
+  EXPECT_EQ(6, m2(2, 1));
+
+
+}
+
+
 
 //-----------------------------------------------------------
 //-----------------------------------------------------------
@@ -121,13 +284,13 @@ TEST(matrixCreate, matrixDoubleTwoElemColMaj){
 }
 
 TEST(matrixCreate, matrixDoubleTwoElemColMajFromTab){
-  mat::Matrix<double,1,2> m({
+  mat::Matrix<double,1,2, mat::MatrixOrdering::ColMajor> m({
     1.75, 2.25
   });
   EXPECT_TRUE(m.Size == 2);
   EXPECT_TRUE(m.Rows == 1);
   EXPECT_TRUE(m.Cols == 2);
-  EXPECT_TRUE(m.Order == mat::MatrixOrdering::RowMajor);
+  EXPECT_TRUE(m.Order == mat::MatrixOrdering::ColMajor);
   EXPECT_DOUBLE_EQ(1.75, m(0,0));
   EXPECT_DOUBLE_EQ(2.25, m(0,1));
 }
@@ -164,7 +327,7 @@ TEST(matrixCreate, matrixInt2x2ElemRowMajSpecified){
 TEST(matrixCreate, matrixDouble2x2ElemRowMajFromTab){
   mat::Matrix<double,2,2> m({
     1.75, 2.25,
-    0   , 1 
+    0.0   , 1.0 
   });
   EXPECT_TRUE(m.Size == 4);
   EXPECT_TRUE(m.Rows == 2);
@@ -192,8 +355,8 @@ TEST(matrixCreate, matrixInt2x2ElemColMaj){
   EXPECT_TRUE(m(1,1)==0);
 }
 
-TEST(matrixCreate, matrixInt2x2ElemColMajFromTab){
-  mat::Matrix<int,2,2> m({
+TEST(matrixCreate, matrixDouble2x2ElemColMajFromTab){
+  mat::Matrix<int,2,2,mat::MatrixOrdering::ColMajor> m({
     1, 2,
     3, 4 
   });
@@ -242,6 +405,20 @@ TEST(matrixCreate, Identity1Matrix2){
   EXPECT_EQ(1, m2(1,1));
   EXPECT_EQ(1, m2(0,1));
   EXPECT_EQ(1, m2(1,0));
+TEST(matrixCreate , matrix3x2ElemColMajFromTab){
+  mat::Matrix<int,3,2,mat::MatrixOrdering::ColMajor> m({
+    1, 2,
+    3, 4,
+    5, 6
+  });
+  EXPECT_TRUE(m.Size == 6);
+  EXPECT_TRUE(m.Rows == 3);
+  EXPECT_TRUE(m.Cols == 2);
+  EXPECT_TRUE(m.Order == mat::MatrixOrdering::ColMajor);
+  EXPECT_EQ(1, m(0,0));
+  EXPECT_EQ(3, m(0,1));
+  EXPECT_EQ(5, m(2,0));
+  EXPECT_EQ(6, m(2,1));
 }
 
 int main(int argc, char* argv[]) {
